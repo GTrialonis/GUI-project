@@ -4,12 +4,13 @@ import random
 import requests
 from bs4 import BeautifulSoup
 import google.generativeai as genai
+import tkinter.font as tkFont
 
 # Configure the API key
-genai.configure(api_key='.....PUT YOUR API KEY HERE.........')
+# genai.configure(api_key='AIzaSyBRmyYzJoQhQgIH3Kdr-Urxj_MdohvsRaY')
 
 # Set the model
-model = genai.GenerativeModel('gemini-2.0-flash')
+# model = genai.GenerativeModel('gemini-2.0-flash')
 
 # Create file dialog to open path to file for translation
 
@@ -30,7 +31,8 @@ class VocabularyApp:
         self.total_questions = 0  # Total number of questions asked
         self.correct_answers = 0  # Number of correct answers
         self.flip_mode = False  # Tracks whether flip mode is active
-        
+        self.left_section_font = tkFont.Font(family="Helvetica", size=11, weight="bold")  # Add this line
+
         # Left Side - Vocabulary, Study Text, and Translation Boxes
         self.create_left_section()
         
@@ -41,41 +43,45 @@ class VocabularyApp:
         self.create_right_section()
 
     def create_left_section(self):
+        font = self.left_section_font
         left_frame = tk.Frame(self.root, bg="#222")
         left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
-        self.vocabulary_textbox = self.create_labeled_textbox(left_frame, "Vocabulary:", True, height=10)
-        self.study_textbox = self.create_labeled_textbox(left_frame, "Study Text Box:", True, height=10)
-        self.translation_textbox = self.create_labeled_textbox(left_frame, "Translation Box:", True, height=10)
+        self.vocabulary_textbox = self.create_labeled_textbox(left_frame, "Vocabulary:", True, height=10, label_font=font)
+        self.study_textbox = self.create_labeled_textbox(left_frame, "Study Text Box:", True, height=10, label_font=font)
+        self.translation_textbox = self.create_labeled_textbox(left_frame, "Translation Box:", True, height=10, label_font=font)
    
     def create_middle_section(self):
         middle_frame = tk.Frame(self.root, bg="#222")
         middle_frame.pack(side=tk.LEFT, fill=tk.Y, padx=10, pady=35)
+        # Create a font object (optional, but recommended for consistency)
+        my_font = ("Helvetica", 10, "bold")  # (font_family, size, style) DO NOT CHANGE THIS
         
         # Buttons for Vocabulary Box
-        tk.Button(middle_frame, text="LOAD-VOC", bg="#336699", fg="white", command=self.load_vocabulary).pack(pady=5)
-        tk.Button(middle_frame, text="SAVE-VOC", bg="#008844", fg="white", command=self.save_vocabulary).pack(pady=5)
-        tk.Button(middle_frame, text="SORT", bg="#AA8800", fg="black", command=self.sort_vocabulary).pack(pady=10)
-        tk.Button(middle_frame, text="CLR-VOC", bg="#AA0000", fg="white", command=self.clear_vocabulary).pack(pady=25)
+        tk.Button(middle_frame, text="LOAD-VOC", bg="#336699", font = my_font, fg="white", command=self.load_vocabulary).pack(pady=5)
+        tk.Button(middle_frame, text="SAVE-VOC", bg="#008844", font = my_font, fg="white", command=self.save_vocabulary).pack(pady=5)
+        tk.Button(middle_frame, text="SORT", font = my_font, bg="#AA8800", fg="black", command=self.sort_vocabulary).pack(pady=10)
+        tk.Button(middle_frame, text="CLR-VOC", bg="#AA0000", font = my_font, fg="white", command=self.clear_vocabulary).pack(pady=25)
         
         # Buttons for Study Text Box
-        tk.Button(middle_frame, text="LOAD-TXT", bg="#336699", fg="white", command=self.load_study_text).pack(pady=10)
-        tk.Button(middle_frame, text="SAVE-TXT", bg="#008844", fg="white", command=self.save_study_text).pack(pady=5)
-        tk.Button(middle_frame, text="CLR-TXT", bg="#AA0000", fg="white", command=self.clear_study_text).pack(pady=5)
-        tk.Button(middle_frame, text="TRANSLATE", bg="#590b75", fg="white", command=self.translate_study_text).pack(pady=5)
-        tk.Button(middle_frame, text="NOTES", bg="#AA8800", fg="black", command=self.add_notes).pack(pady=15)
+        tk.Button(middle_frame, text="LOAD-TXT", bg="#336699", font = my_font, fg="white", command=self.load_study_text).pack(pady=10)
+        tk.Button(middle_frame, text="SAVE-TXT", bg="#008844", font = my_font, fg="white", command=self.save_study_text).pack(pady=5)
+        tk.Button(middle_frame, text="CLR-TXT", bg="#AA0000", font = my_font, fg="white", command=self.clear_study_text).pack(pady=5)
+        tk.Button(middle_frame, text="TRANSLATE", bg="#590b75", font = my_font, fg="white", command=self.translate_study_text).pack(pady=25)
+        
         
         # Buttons for Translation Box
-        tk.Button(middle_frame, text="LOAD-TRA", bg="#336699", fg="white", command=self.load_translation).pack(pady=20)
-        tk.Button(middle_frame, text="SAVE-TRA", bg="#008844", fg="white", command=self.save_translation).pack(pady=5)
-        tk.Button(middle_frame, text="CLR-TRA", bg="#AA0000", fg="white", command=self.clear_translation).pack(pady=15)
+        tk.Button(middle_frame, text="LOAD-TRA", bg="#336699", font = my_font, fg="white", command=self.load_translation).pack(pady=20)
+        tk.Button(middle_frame, text="SAVE-TRA", bg="#008844", font = my_font, fg="white", command=self.save_translation).pack(pady=5)
+        tk.Button(middle_frame, text="CLR-TRA", bg="#AA0000", font = my_font, fg="white", command=self.clear_translation).pack(pady=15)
+        tk.Button(middle_frame, text="NOTES", bg="#AA8800", font = my_font, fg="black", command=self.add_notes).pack(pady=5)
    
     def create_right_section(self):
         right_frame = tk.Frame(self.root, bg="#222")
         right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
         
         # Example Sentences
-        self.example_sentences_textbox = self.create_labeled_textbox(right_frame, "EXAMPLE SENTENCES", True, height=10)
+        self.example_sentences_textbox = self.create_labeled_textbox(right_frame, "Find example sentences for a word using AI or the Glosbe dict.", True, height=10)
         
         # New Input Box for Glosbe Search
         self.glosbe_search_entry = tk.Entry(right_frame, bg="black", fg="white", insertbackground="white", font=("Tahoma", 11))
@@ -84,9 +90,11 @@ class VocabularyApp:
         # Buttons for Example Sentences
         btn_frame = tk.Frame(right_frame, bg="#222")
         btn_frame.pack(fill=tk.X)
+        tk.Button(btn_frame, text="AI Examples", bg="#590b75", fg="white", command=self.fetch_ai_examples).pack(side=tk.LEFT, padx=5)
         tk.Button(btn_frame, text="Glosbe Examples", bg="#004466", fg="white", command=self.fetch_glosbe_examples).pack(side=tk.LEFT, padx=5)
         tk.Button(btn_frame, text="Save Examples", bg="#008844", fg="white", command=self.save_examples).pack(side=tk.LEFT, padx=5)
-        tk.Button(btn_frame, text="CLEAR", bg="#AA0000", fg="white", command=self.clear_example_sentences).pack(side=tk.LEFT, padx=5)
+        tk.Button(btn_frame, text="Clear Input", bg="orange", fg="black", command=self.clear_examples_input).pack(side=tk.LEFT, padx=5)
+        tk.Button(btn_frame, text="Clear Examples", bg="#AA0000", fg="white", command=self.clear_example_sentences).pack(side=tk.LEFT, padx=5)
         
         # Vocabulary Test Section
         test_frame = tk.Frame(right_frame, bg="#222")
@@ -113,27 +121,51 @@ class VocabularyApp:
         answer_frame = tk.Frame(right_frame, bg="#222")
         answer_frame.pack(fill=tk.X)
         tk.Button(answer_frame, text="Next Word", bg="#005588", fg="white", command=self.next_word).pack(side=tk.LEFT, padx=5, pady=5)
-        tk.Button(answer_frame, text="Clear Input", bg="yellow", fg="black", command=self.clear_input).pack(side=tk.LEFT, padx=5)
+        tk.Button(answer_frame, text="Clear Input", bg="orange", fg="black", command=self.clear_input).pack(side=tk.LEFT, padx=5)
         tk.Label(answer_frame, text="Score:", fg="white", bg="#222").pack(side=tk.LEFT, padx=5)
         self.score_label = tk.Label(answer_frame, text="0%", fg="white", bg="#222")
         self.score_label.pack(side=tk.LEFT)
         
         # Dictionary Search
-        tk.Label(right_frame, text="SEARCH ONLINE DICTIONARIES", fg="gold", bg="#222").pack(anchor='w', pady=5)
+        tk.Label(right_frame, text="Search word using AI or Langenscheid online dictionary", fg="gold", bg="#222").pack(anchor='w', pady=5)
         self.dictionary_entry = tk.Entry(right_frame, bg="black", fg="white", insertbackground="white", font=("Tahoma", 11))
         self.dictionary_entry.pack(fill=tk.X)
         
         dict_btn_frame = tk.Frame(right_frame, bg="#222")
         dict_btn_frame.pack(fill=tk.X)
+        tk.Button(dict_btn_frame, text="AI word translation", bg="#590b75", fg="white", command=self.ai_translate_word).pack(side=tk.LEFT, padx=5, pady=5)
         tk.Button(dict_btn_frame, text="Langenscheidt", bg="#446688", fg="white", command=self.fetch_langenscheidt).pack(side=tk.LEFT, padx=5, pady=5)
+        tk.Button(dict_btn_frame, text="Clear Input", bg="orange", fg="black", command=self.clear_entry).pack(side=tk.LEFT, padx=5)
    
-    def create_labeled_textbox(self, parent, label_text, add_scrollbar=False, height=5):
+    def create_labeled_textbox(self, parent, label_text, add_scrollbar=False, height=5, label_font=None):
         frame = tk.Frame(parent, bg="#222")
-        frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        tk.Label(frame, text=label_text, fg="gold", bg="#222").pack(anchor='w')
-        textbox = scrolledtext.ScrolledText(frame, height=height, wrap=tk.WORD, bg="#333", fg="white", font=("Tahoma", 11))
-        textbox.pack(fill=tk.BOTH, expand=True)
+        frame.pack(fill=tk.X, padx=10, pady=5) # Pack the container frame
+
+        # Create the label widget
+        label = tk.Label(frame, text=label_text, fg="gold", bg="#222")
+
+        # Apply the custom font to the label IF one was provided
+        if label_font:
+            label.config(font=label_font) # Use config() to set the font
+
+        # Pack the label
+        label.pack(anchor='w') # Anchor to the west (left side)
+
+        # Create the ScrolledText widget
+        # Note: The font argument here applies to the text *inside* the input box,
+        # not the label.
+        textbox = scrolledtext.ScrolledText(
+            frame,
+            height=height,
+            wrap=tk.WORD,
+            bg="#333",          # Background of the text area
+            fg="white",          # Text color in the text area
+            insertbackground="white", # Color of the cursor
+            font=("Tahoma", 11)  # Font for the text typed IN the box
+        )
+        textbox.pack(fill=tk.BOTH, expand=True) # Pack the text box
+
+        # Return the textbox widget so you can interact with it later
         return textbox
    
     def load_vocabulary(self):
@@ -183,8 +215,9 @@ class VocabularyApp:
             try:
                 with open(filename, 'r', encoding='utf-8') as file:
                     content = file.read()
-                    # model = genai.GenerativeModel('gemini-2.0-flash')  # You already have this line
-                    # prompt = "Please translate the contents of the file into English" # You already have this line
+                    genai.configure(api_key='AIzaSyBRmyYzJoQhQgIH3Kdr-Urxj_MdohvsRaY')
+                    model = genai.GenerativeModel('gemini-2.0-flash')  # You already have this line
+                    prompt = "Please translate the contents of the file into English" # You already have this line
                     response = model.generate_content(f"{prompt}\n{content}")
                     translated_text = response.text
                     self.translation_textbox.delete(1.0, tk.END)  # Clear previous content
@@ -248,6 +281,35 @@ class VocabularyApp:
         self.example_sentences_textbox.delete(1.0, tk.END)
         for example in examples_list:
             self.example_sentences_textbox.insert(tk.END, example)
+    
+    def ai_translate_word(self):
+        word = self.dictionary_entry.get().strip()
+        if not word:
+            return
+        genai.configure(api_key='AIzaSyBRmyYzJoQhQgIH3Kdr-Urxj_MdohvsRaY')
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        prompt = "Please translate this word into English and respond with an equal sign followed by two or more words in English that\
+            match the meaning of the word. For example: Auftrag, der (pl. Aufträge) = order, commission, assignment, task, contract, job"
+        response = model.generate_content(f"{prompt}\n{word}")
+        translated_word = response.text
+        # self.translation_textbox.delete(1.0, tk.END)  # Clear previous content
+        self.vocabulary_textbox.insert(tk.END, translated_word)  # Insert translated text into the CORRECT textbox
+
+    def fetch_ai_examples(self):
+        entry = self.glosbe_search_entry.get().strip()
+        if not entry:
+            return
+        
+        genai.configure(api_key='AIzaSyBRmyYzJoQhQgIH3Kdr-Urxj_MdohvsRaY')
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        prompt = "Please give me not more than two examples of how the entry (German word) is used. Your examples should be in the format,\
+            for example: Ich habe einen neuen Auftrag von der Firma bekommen. = I received a new order from the company. Also, do not number \
+                your examples but separate them with a carriage return."
+        response = model.generate_content(f"{prompt}\n{entry}")
+        translated_entry = response.text
+        # self.translation_textbox.delete(1.0, tk.END)  # Clear previous content
+        self.example_sentences_textbox.insert(tk.END, translated_entry)  # Insert translated text into the CORRECT textbox
+
    
     def fetch_langenscheidt(self):
         word = self.dictionary_entry.get().strip()
@@ -293,6 +355,9 @@ class VocabularyApp:
    
     def clear_example_sentences(self):
         self.example_sentences_textbox.delete(1.0, tk.END)
+    
+    def clear_examples_input(self):
+        self.glosbe_search_entry.delete(0, tk.END)
    
     def load_test_file(self):
         filename = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
@@ -329,6 +394,9 @@ class VocabularyApp:
     def clear_input(self):
         self.answer_entry.delete(0, tk.END)
     
+    def clear_entry(self):
+        self.dictionary_entry.delete(0, tk.END)
+    
     def check_answer(self, event=None):
         user_answer = self.answer_entry.get().strip()
         if self.flip_mode:
@@ -342,7 +410,7 @@ class VocabularyApp:
             self.test_textbox.insert(tk.END, "*** Congratulations! You are correct ***\n")
             self.correct_answers += 1
         else:
-            self.test_textbox.insert(tk.END, f"*** I'm sorry. The correct answer is: {', '.join(correct_answers)} ***\n")
+            self.test_textbox.insert(tk.END, f"*** You wrote:  {user_answer}\n I'm sorry. The correct answer is: {', '.join(correct_answers)} ***\n")
         
         # Calculate score
         if self.total_questions > 0:
@@ -350,6 +418,7 @@ class VocabularyApp:
             self.score_label.config(text=f"{self.score}%")
         
         self.clear_input()
+    
 
 if __name__ == "__main__":
     root = tk.Tk()
